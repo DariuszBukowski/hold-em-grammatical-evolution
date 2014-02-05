@@ -32,6 +32,14 @@ class chromosome:
             c += int(self.string[p])
             p += 1
         self.pos = (self.pos + 4) % len(self.string)
+    
+    def add(num):
+        num = num % 16
+        s = num.__format__("b")
+        while len(s) < 4:
+            s = "0"+s
+        self.string = self.string+s
+        
 
 #grammar: 
 
@@ -43,7 +51,7 @@ class g_expr:
         return self.t.eval(game)
     def construct(self, chr):
         x = chr.read_next_codon()
-        if x%2 == 0
+        if x%2 == 0:
             self.t = g_cond()
         else:
             self.t = g_action()
@@ -93,7 +101,7 @@ class g_bool:
             return self.b1.eval(game) and self.b2.eval(game)
         elif self.type == 1:
             return self.b1.eval(game) or self.b2.eval(game)
-        else
+        else:
             return self.b1.eval(game)
     def construct(self, chr):
         x = chr.read_next_codon()
@@ -215,9 +223,9 @@ class g_intval:
         self.int = g_digit()
         chr = self.int.construct(chr)
         
-        if x%2 == 0
-        self.intval = g_intval()
-        chr = self.intval.construct(chr)
+        if x%2 == 0:
+            self.intval = g_intval()
+            chr = self.intval.construct(chr)
         
         return chr
         
