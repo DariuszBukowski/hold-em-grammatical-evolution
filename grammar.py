@@ -33,7 +33,7 @@ class chromosome:
             p += 1
         self.pos = (self.pos + 4) % len(self.string)
     
-    def add(num):
+    def add(self, num):
         num = num % 16
         s = num.__format__("b")
         while len(s) < 4:
