@@ -10,6 +10,7 @@ class game:
     def __init__(self):
 	self.blindBet = 10
 	self.startingCapital = 1000
+	self.iterations = 100
 	self.pot = 0
 	self.currentRound = 0
 	self.players = []
@@ -22,9 +23,10 @@ class game:
     def run(self):
 	self.cards = range(52) # numbers from 0 to 51 - cards from 2 to A, clubs, diamonds, hearts, spades
 	startingPlayer = 0
-	while self.playersCapital[0] >= self.blindBet and self.playersCapital[1] >= self.blindBet:
+	iteration = 0
+	while self.playersCapital[0] >= self.blindBet and self.playersCapital[1] >= self.blindBet and iteration < self.iterations:
 	    random.shuffle(self.cards)
-	    print self.playersCapital[0], 'to', self.playersCapital[1]
+	    print 'after', iteration, 'iterations', self.playersCapital[0], 'to', self.playersCapital[1]
 	    self.pot = self.blindBet
 	    bidDifference = self.blindBet
 	    alreadyCalled = False
@@ -84,6 +86,9 @@ class game:
 		    self.pot = 0
 		    break
 		self.currentRound += 1
+	    iteration += 1
+	if iteration == self.iterations:
+	    return self.playersCapital[1] > self.playersCapital[0]
 	return self.playersCapital[0] < self.blindBet
 
     def get_players_hand(self, player):
