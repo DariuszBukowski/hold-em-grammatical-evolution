@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -21,7 +22,7 @@ class population_member:
 
 class chromosome:
     def __init__(self):
-        self.string = "0000" #placeholder value
+        self.string = "00010000" #placeholder value
         self.pos = 0
     
     def read_next_codon(self):
@@ -32,6 +33,7 @@ class chromosome:
             c += int(self.string[p])
             p += 1
         self.pos = (self.pos + 4) % len(self.string)
+        return c
     
     def add(self, num):
         num = num % 16
@@ -87,7 +89,7 @@ class g_action:
         return self.action_type
     def construct(self, chr):
         x = chr.read_next_codon()
-        self.val = x%3
+        self.action_type = x%3
         return chr
 
 #<bool> :: <bool> and <bool>|<bool> or <bool>|<hand>|<pot>
@@ -108,7 +110,7 @@ class g_bool:
         self.type = x%4
         
         self.val = g_intval()
-        chr = self.intval.construct(chr)
+        chr = self.val.construct(chr)
         return chr
         
 #<hand> :: hand better than <hand_value>|hand worse than <hand value>

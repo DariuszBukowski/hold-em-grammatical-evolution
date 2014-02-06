@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -20,7 +21,7 @@ class game:
     def run(self):
 	self.numberOfPlayers = len(self.players)
 	playersLeft = deque(range(0, self.numberOfPlayers))
-	cards = range(0,52)
+	cards = range(52)
 	while len(playersLeft) > 1:
 	    random.shuffle(cards)
 	    self.pot = 0
