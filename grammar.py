@@ -10,20 +10,43 @@ class population_member:
         self.rule = [None, None, None, None]
         for i in range(4):
             self.chr[i] = chromosome()
+        self.init_chr0()
+        self.init_chr_random(1)
+        self.init_chr_random(2)
+        self.init_chr_random(3)
+        
         
     def construct(self):
         for i in range(4):
-            self.chr[i].pos = 0
+            self.chr[i].reset()
             self.rule[i] = g_expr()
             self.rule[i].construct(self.chr[i])
     
     def evaluate(self, game, i): #i - round of betting
         return self.rule[i].eval(game)
-
+    
+    def init_chr0(self):
+        self.chr[0].string = "0000" #cond
+        self.chr[0].add(3) #hand
+        self.chr[0].add(0) #better than
+        self.chr[0].add(random.randint(0,1)) #high card or pair
+        self.chr[0].add(random.randint(0,12)) #random card value
+        self.chr[0].add(1)
+        self.chr[0].add(random.randint(0,1)) #if true then raise or call
+        self.chr[0].add(1)
+        self.chr[0].add(2) #else fold
+    
+    def init_chr_random(self, i):
+        self.chr[0].string = "0000" #cond
+        for j in range(50):
+            self.chr[i].add(random.randint(0,15))
+            
 class chromosome:
     def __init__(self):
         self.string = "00010000" #placeholder value
         self.pos = 0
+        self.loops = 0
+        self.loop_cap = 10
     
     def read_next_codon(self):
         c = 0
@@ -33,7 +56,13 @@ class chromosome:
             c += int(self.string[p])
             p += 1
         self.pos = (self.pos + 4) % len(self.string)
+        if self.pos == 0:
+            self.loops += 1
         return c
+    
+    def reset(self):
+        self.pos = 0
+        self.loops = 0
     
     def add(self, num):
         num = num % 16
@@ -53,7 +82,7 @@ class g_expr:
         return self.t.eval(game)
     def construct(self, chr):
         x = chr.read_next_codon()
-        if x%2 == 0:
+        if x%2 == 0 and chr.loops < chr.loop_cap:
             self.t = g_cond()
         else:
             self.t = g_action()
@@ -109,7 +138,18 @@ class g_bool:
         x = chr.read_next_codon()
         self.type = x%4
         
-        self.val = g_intval()
+        if self.type < 2 and chr.loops < chr.loop_cap:
+            self.b1 = g_bool()
+            chr = self.b1.construct(chr)
+            self.b2 = g_bool()
+            chr = self.b2.construct(chr)
+        elif self.type == 3:
+            self.b1 = g_hand()
+            chr = self.b1.construct(chr)
+        else:
+            self.b1 = g_pot()
+            chr = self.b1.construct(chr)
+        
         chr = self.val.construct(chr)
         return chr
         
@@ -142,7 +182,7 @@ class g_hand:
         self.better_worse = x%2
         
         self.val = g_hand_value()
-        chr = self.intval.construct(chr)
+        chr = self.val.construct(chr)
         return chr
             
 
@@ -225,7 +265,7 @@ class g_intval:
         self.int = g_digit()
         chr = self.int.construct(chr)
         
-        if x%2 == 0:
+        if x%2 == 0 and chr.loops < chr.loop_cap:
             self.intval = g_intval()
             chr = self.intval.construct(chr)
         
