@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import random
-import matplotlib.pyplot as plt
 import math
 
 class population_member:
@@ -96,7 +95,7 @@ class g_cond:
         self.e1 = None
         self.e2 = None
     def eval(self, game):
-        b = self.b.eval()
+        b = self.b.eval(game)
         if b:
             return self.e1.eval(game)
         else:
@@ -149,8 +148,7 @@ class g_bool:
         else:
             self.b1 = g_pot()
             chr = self.b1.construct(chr)
-        
-        chr = self.val.construct(chr)
+
         return chr
         
 #<hand> :: hand better than <hand_value>|hand worse than <hand value>
@@ -246,7 +244,7 @@ class g_pot:
         self.better_worse = x%2
         
         self.val = g_intval()
-        chr = self.intval.construct(chr)
+        chr = self.val.construct(chr)
         return chr
     
     
@@ -255,10 +253,10 @@ class g_intval:
     def __init__(self):
         self.int = None
         self.intval = None
-    def eval(self):
-        v = self.val
+    def eval(self, game):
+        v = self.int.eval(game)
         if self.intval:
-            v = v*10 + self.intval.eval()
+            v = v*10 + self.intval.eval(game)
         return v
     def construct(self, chr):
         x = chr.read_next_codon()
@@ -275,7 +273,7 @@ class g_intval:
 class g_digit:
     def __init__(self):
         self.val = None
-    def eval(self):
+    def eval(self, game):
         return self.val
     def construct(self, chr):
         x = chr.read_next_codon()

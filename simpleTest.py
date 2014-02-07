@@ -11,7 +11,7 @@ def main():
     G = twoPlayersGame.game()
     G.addPlayer(c1)
     G.addPlayer(c2)
-    print G.run()
+    print(G.run())
 
 if __name__ == "__main__":
     main()
