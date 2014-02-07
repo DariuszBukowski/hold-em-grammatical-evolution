@@ -45,15 +45,75 @@ def mutate(c, p):
     
     return cn
                 
+def tourney(population):
+    random.shuffle(population)
+    winners = []
+    i = 0
+    while i < len(population) - 1:
+        c1 = population[i]
+        c2 = population[i+1]
+        G = twoPlayersGame.game()
+        G.addPlayer(c1)
+        G.addPlayer(c2)
+        if G.run():
+            winners.append(c2)
+        else:
+            winners.append(c1)
+        i += 2
+    return winners
 
-def algorithm(pop_size, iters):
+def algorithm(pop_size, iters, mutation_p):
     population = []
     for i in range(pop_size):
-        population.append(grammar.population_member())
+        c = grammar.population_member()
+        c.construct()
+        population.append(c)
     
     for i in range(iters):
-        #evaluate the population
-        #select the best-performing members
+        #evaluate the population, keeping the tourney winners
+        new_population = []
+        
+        while len(population) > pop_size:
+            population = tourney(population)
+            
         #perform crossovers and mutations
-        pass
-    
+        mut_population = []
+        for c in population:
+            mut_population.append(mutate(c, mutation_p)
+        
+        child_population = []
+        i = 0
+        while i < len(population) - 1:
+            c1 = population[i]
+            c2 = population[i+1]
+            
+            c3, c4 = cross_over_all(c1, c2)
+            child_population.append(c3)
+            child_population.append(c4)
+            
+            c3, c4 = cross_over_one(c1, c2, 0)
+            child_population.append(c3)
+            child_population.append(c4)
+            
+            c3, c4 = cross_over_one(c1, c2, 1)
+            child_population.append(c3)
+            child_population.append(c4)
+            
+            c3, c4 = cross_over_one(c1, c2, 2)
+            child_population.append(c3)
+            child_population.append(c4)
+            
+            c3, c4 = cross_over_one(c1, c2, 3)
+            child_population.append(c3)
+            child_population.append(c4)
+            
+            i += 2
+        
+        mut_child_population = []
+        for c in child_population:
+            mut_child_population.append(mutate(c, mutation_p)
+        
+        population.extend(mut_population)
+        population.extend(child_population)
+        population.extend(mut_child_population)
+        
