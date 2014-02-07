@@ -26,14 +26,32 @@ class population_member:
     
     def init_chr0(self):
         self.chr[0].string = "0000" #cond
+        
+        
         self.chr[0].add(3) #hand
         self.chr[0].add(0) #better than
         self.chr[0].add(random.randint(0,1)) #high card or pair
         self.chr[0].add(random.randint(0,12)) #random card value
-        self.chr[0].add(1)
-        self.chr[0].add(random.randint(0,1)) #if true then raise or call
-        self.chr[0].add(1)
-        self.chr[0].add(2) #else fold
+        
+        
+        self.chr[0].add(0) #if true then cond
+        self.chr[0].add(4) #pot
+        self.chr[0].add(0) #less than _?
+        
+        self.chr[0].add(0) # _ _?
+        self.chr[0].add(5) # 5 _?
+        self.chr[0].add(1) # 5 _
+        self.chr[0].add(0) # 5 0
+        
+        self.chr[0].add(1) #if true then
+        self.chr[0].add(0) #raise
+        
+        self.chr[0].add(1) #else
+        self.chr[0].add(1) #call
+        
+        
+        self.chr[0].add(1) #else
+        self.chr[0].add(2) #fold
     
     def init_chr_random(self, i):
         self.chr[i].string = "0000" #cond
@@ -87,6 +105,9 @@ class g_expr:
             self.t = g_action()
         chr = self.t.construct(chr)
         return chr
+    
+    def text(self):
+        return self.t.text()
         
 #<cond> :: if <bool> then <expr> else <expr>
 class g_cond:
@@ -109,6 +130,9 @@ class g_cond:
         chr = self.e2.construct(chr)
         return chr
         
+    def text(self):
+        return "if ( " + self.b.text() + " ) then ( " + self.e1.text() + " ) else ( " + self.e2.text() + " )"
+        
 #<action> :: call|raise|fold
 class g_action:
     def __init__(self):
@@ -119,6 +143,13 @@ class g_action:
         x = chr.read_next_codon()
         self.action_type = x%3
         return chr
+    def text(self):
+        if self.action_type == 0:
+            return "call"
+        elif self.action_type == 1:
+            return "raise"
+        else:
+            return "fold"
 
 #<bool> :: <bool> and <bool>|<bool> or <bool>|<hand>|<pot>|<cash>
 class g_bool:
@@ -154,6 +185,14 @@ class g_bool:
             chr = self.b1.construct(chr)
 
         return chr
+    
+    def text(self):
+        if self.type == 0:
+            return "( " + self.b1.text() + " ) and ( " + self.b2.text() + " )"
+        elif self.type == 1:
+            return "( " + self.b1.text() + " ) or ( " + self.b2.text() + " )"
+        else:
+            return self.b1.text()
         
 #<hand> :: hand better than <hand_value>|hand worse than <hand value>
 class g_hand:
@@ -186,6 +225,14 @@ class g_hand:
         self.val = g_hand_value()
         chr = self.val.construct(chr)
         return chr
+    
+    def text(self):
+        t = ""
+        if self.better_worse == 0:
+            t = "better"
+        else:
+            t = "worse"
+        return "hand " + t + " than " + self.val.text()
             
 
 #<hand_value> :: high <card>|pair <card>|two pairs <card> <card>|three <card>|straight <card>|flush|full house <card> <card>|four <card>|straight flush <card>
@@ -214,6 +261,15 @@ class g_hand_value:
                 self.c2 = g_card()
                 chr = self.c2.construct(chr)
         return chr
+    
+    def text(self):
+        hands = ["high","pair","two pairs","three","straight","flush","full house","four","straight flush"]
+        text = hands[self.val]
+        if (self.c1):
+            text = text + " " + self.c1.text()
+        if (self.c2):
+            text = text + " " + self.c2.text()
+        return text
         
 #<card> :: 2|3|4|...|10|J|Q|K|A - 13 card values
 class g_card:
@@ -227,6 +283,18 @@ class g_card:
         x = chr.read_next_codon()
         self.val = x%13
         return chr
+    
+    def text(self):
+        if self.val < 9:
+            return str(self.val+2)
+        elif self.val == 9:
+            return "J"
+        elif self.val == 10:
+            return "Q"
+        elif self.val == 11:
+            return "K"
+        else:
+            return "A"
         
 #<pot> :: pot less than <intval>|pot more than <intval>
 class g_pot:
@@ -250,10 +318,18 @@ class g_pot:
         self.val = g_intval()
         chr = self.val.construct(chr)
         return chr
+    
+    def text(self):
+        t = ""
+        if self.better_worse == 0:
+            t = "less"
+        else:
+            t = "more"
+        return "pot " + t + " than " + self.val.text()
         
 
 #<cash> :: have less than <intval>|have more than <intval>
-    class g_cash:
+class g_cash:
     def __init__(self):
         self.better_worse = None
         self.val = None
@@ -275,6 +351,14 @@ class g_pot:
         chr = self.val.construct(chr)
         return chr
     
+    def text(self):
+        t = ""
+        if self.better_worse == 0:
+            t = "less"
+        else:
+            t = "more"
+        return "have " + t + " than " + self.val.text()
+    
 #<intval> :: <int><intval>|<int>
 class g_intval:
     def __init__(self):
@@ -295,6 +379,12 @@ class g_intval:
             chr = self.intval.construct(chr)
         
         return chr
+    
+    def text(self):
+        text = self.int.text()
+        if self.intval:
+            text = text + self.intval.text()
+        return text
         
 #<digit> :: 0|1|...|9
 class g_digit:
@@ -306,3 +396,6 @@ class g_digit:
         x = chr.read_next_codon()
         self.val = x % 10
         return chr
+    
+    def text(self):
+        return str(self.val)
