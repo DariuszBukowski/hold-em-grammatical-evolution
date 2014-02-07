@@ -36,7 +36,7 @@ class population_member:
         self.chr[0].add(2) #else fold
     
     def init_chr_random(self, i):
-        self.chr[0].string = "0000" #cond
+        self.chr[i].string = "0000" #cond
         for j in range(50):
             self.chr[i].add(random.randint(0,15))
             
@@ -120,7 +120,7 @@ class g_action:
         self.action_type = x%3
         return chr
 
-#<bool> :: <bool> and <bool>|<bool> or <bool>|<hand>|<pot>
+#<bool> :: <bool> and <bool>|<bool> or <bool>|<hand>|<pot>|<cash>
 class g_bool:
     def __init__(self):
         self.type = None
@@ -135,18 +135,22 @@ class g_bool:
             return self.b1.eval(game)
     def construct(self, chr):
         x = chr.read_next_codon()
-        self.type = x%4
+        self.type = x%5
         
         if self.type < 2 and chr.loops < chr.loop_cap:
             self.b1 = g_bool()
             chr = self.b1.construct(chr)
             self.b2 = g_bool()
             chr = self.b2.construct(chr)
-        elif self.type == 3:
+        elif self.type <= 3:
+            self.type = 3 #if loop cap is reached, default to type 3 condition
             self.b1 = g_hand()
             chr = self.b1.construct(chr)
-        else:
+        elif self.type == 4:
             self.b1 = g_pot()
+            chr = self.b1.construct(chr)
+        else:
+            self.b1 = g_cash()
             chr = self.b1.construct(chr)
 
         return chr
@@ -158,7 +162,7 @@ class g_hand:
         self.val = None
     def eval(self, game):
         v = self.val.eval(game)
-        h = game.get_hand()#placeholder, gotta get data from the game state somehow
+        h = game.get_hand()
         
         if self.better_worse == 0:
             result = h[0] > v[0]
@@ -198,7 +202,7 @@ class g_hand_value:
             c1 = self.c1.eval(game)
         if (self.c2):
             c2 = self.c2.eval(game)
-        return (self.val.eval(game), c1, c2)
+        return (self.val, c1, c2)
         
     def construct(self, chr):
         x = chr.read_next_codon()
@@ -232,7 +236,7 @@ class g_pot:
         
     def eval(self, game):
         v = self.val.eval(game)
-        p = game.get_pot()#placeholder, gotta get data from the game state somehow
+        p = game.get_pot()
         
         if self.better_worse == 0:
             return p < v
@@ -246,7 +250,30 @@ class g_pot:
         self.val = g_intval()
         chr = self.val.construct(chr)
         return chr
-    
+        
+
+#<cash> :: have less than <intval>|have more than <intval>
+    class g_cash:
+    def __init__(self):
+        self.better_worse = None
+        self.val = None
+        
+    def eval(self, game):
+        v = self.val.eval(game)
+        p = game.get_cash()
+        
+        if self.better_worse == 0:
+            return p < v
+        else:
+            return p > v
+            
+    def construct(self, chr):
+        x = chr.read_next_codon()
+        self.better_worse = x%2
+        
+        self.val = g_intval()
+        chr = self.val.construct(chr)
+        return chr
     
 #<intval> :: <int><intval>|<int>
 class g_intval:

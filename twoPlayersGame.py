@@ -132,6 +132,9 @@ class game:
 
 	def get_pot(self):
 		return self.pot
+		
+	def get_cash(self):
+		return self.playersCapital(self.currentPlayer)
 	
 
 	
