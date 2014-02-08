@@ -103,7 +103,7 @@ def apply_operators(population, mutation_p):
     
     population.extend(mut_population)
     population.extend(child_population)
-    population.extend(mut_child_population)
+    #population.extend(mut_child_population)
     return population
 
 
