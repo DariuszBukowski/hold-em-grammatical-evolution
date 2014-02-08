@@ -15,6 +15,7 @@ class game:
 		self.currentRound = 0
 		self.players = []
 		self.playersCapital = []
+		self.text_output = False
 
 	def addPlayer(self, player):
 		self.players.append(player)
@@ -26,7 +27,8 @@ class game:
 		iteration = 0
 		while self.playersCapital[0] >= self.blindBet and self.playersCapital[1] >= self.blindBet and iteration < self.iterations:
 			random.shuffle(self.cards)
-			print('after', iteration, 'iterations', self.playersCapital[0], 'to', self.playersCapital[1])
+			if self.text_output:
+				print('after', iteration, 'iterations', self.playersCapital[0], 'to', self.playersCapital[1])
 			self.pot = self.blindBet
 			bidDifference = self.blindBet
 			alreadyCalled = False
@@ -40,21 +42,24 @@ class game:
 					action = self.players[self.currentPlayer].evaluate(self, self.currentRound)
 					#Current player folds
 					if action == 2: 
-						print(self.currentPlayer, 'folds')
+						if self.text_output:
+							print(self.currentPlayer, 'folds')
 						self.playersCapital[self.currentPlayer ^ 1] += self.pot
 						self.pot = 0
 						fold = True
 						break
 					#Current player can raise
 					elif action == 1 and not (self.playersCapital[self.currentPlayer] < 2 * self.blindBet or self.playersCapital[self.currentPlayer ^ 1] < self.blindBet):
-						print(self.currentPlayer, 'raises')
+						if self.text_output:
+							print(self.currentPlayer, 'raises')
 						self.playersCapital[self.currentPlayer] -= (self.blindBet + bidDifference)
 						self.pot += self.blindBet + bidDifference
 						bidDifference = self.blindBet
 						self.currentPlayer ^= 1
 					#Current player calls
 					else: 
-						print(self.currentPlayer, 'calls')
+						if self.text_output:
+							print(self.currentPlayer, 'calls')
 						if bidDifference == 0 and not alreadyCalled:
 							alreadyCalled = True
 							self.currentPlayer ^= 1
@@ -72,10 +77,13 @@ class game:
 					break
 				elif self.currentRound == 3:
 					h1 = self.get_players_hand(0)
-					print('which is', h1)
+					if self.text_output:
+						print('which is', h1)
 					h2 = self.get_players_hand(1)
-					print('which is', h2)
-					print('pot was', self.pot)
+					if self.text_output:
+						print('which is', h2)
+					if self.text_output:
+						print('pot was', self.pot)
 					if h1 == h2: #split the pot
 						self.playersCapital[0] += self.pot / 2
 						self.playersCapital[1] += self.pot / 2
@@ -95,7 +103,8 @@ class game:
 		playersCards = [self.cards[player * 2], self.cards[player * 2 + 1]]
 		if self.currentRound > 0:
 			playersCards += self.cards[4 : 6 + self.currentRound]
-		print(player, 'has', playersCards)
+		if self.text_output:
+			print(player, 'has', playersCards)
 		for i in range(8, -1, -1):
 			for j in range(0, 4):
 				if functools.reduce(operator.and_, map(lambda x: x in playersCards, range(i + j * 13, i + j * 13 + 5))):

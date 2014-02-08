@@ -12,7 +12,7 @@ def cross_over_all(c1, c2):
     
     
     for i in range(4):
-        crs = random.randint(1, min(len(c1n.chr[i].string), len(c2n.chr[i].string)-1)
+        crs = random.randint(1, min(len(c1n.chr[i].string), len(c2n.chr[i].string)-1))
         c1n.chr[i].string = c1.chr[i].string[:crs] + c2.chr[i].string[crs:]
         c2n.chr[i].string = c2.chr[i].string[:crs] + c1.chr[i].string[crs:]
     
@@ -25,7 +25,7 @@ def cross_over_one(c1, c2, i):
     c1n = copy.deepcopy(c1)
     c2n = copy.deepcopy(c2)
     
-    crs = random.randint(1, min(len(c1n.chr[i].string), len(c2n.chr[i].string)-1)
+    crs = random.randint(1, min(len(c1n.chr[i].string), len(c2n.chr[i].string)-1))
     c1n.chr[i].string = c1.chr[i].string[:crs] + c2.chr[i].string[crs:]
     c2n.chr[i].string = c2.chr[i].string[:crs] + c1.chr[i].string[crs:]
     
@@ -40,8 +40,8 @@ def mutate(c, p):
     for i in range(4):
         for j in range(len(c.chr[i].string)):
             if random.random() < p:
-                char = str(1 - int(c.chr[i][j]))
-                cn.chr[i] = cn.chr[i][:j] + char + cn.chr[i][(j+1):]
+                char = str(1 - int(c.chr[i].string[j]))
+                cn.chr[i].string = cn.chr[i].string[:j] + char + cn.chr[i].string[(j+1):]
     
     return cn
                 
@@ -69,17 +69,21 @@ def algorithm(pop_size, iters, mutation_p):
         c.construct()
         population.append(c)
     
-    for i in range(iters):
+    for it in range(iters):
         #evaluate the population, keeping the tourney winners
         new_population = []
         
+        
+        
         while len(population) > pop_size:
             population = tourney(population)
-            
+        
+        print("Starting iteration",it)
+        
         #perform crossovers and mutations
         mut_population = []
         for c in population:
-            mut_population.append(mutate(c, mutation_p)
+            mut_population.append(mutate(c, mutation_p))
         
         child_population = []
         i = 0
@@ -111,11 +115,13 @@ def algorithm(pop_size, iters, mutation_p):
         
         mut_child_population = []
         for c in child_population:
-            mut_child_population.append(mutate(c, mutation_p)
+            mut_child_population.append(mutate(c, mutation_p))
         
         population.extend(mut_population)
         population.extend(child_population)
         population.extend(mut_child_population)
+        
+        print("Iteration",it,"done.")
     
     return population
         
