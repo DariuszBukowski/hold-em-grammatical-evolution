@@ -111,7 +111,7 @@ def algorithm_file(starting_filename, iters, mutation_p):
     
     population = []
     with open(starting_filename, 'rb') as f:
-        population = pickle.load
+        population = pickle.load(f)
     
     pop_size = len(population)
     
