@@ -5,6 +5,7 @@ import math
 import grammar
 import operator
 import twoPlayersGame
+import pickle
 
 def cross_over_all(c1, c2):
     c1n = copy.deepcopy(c1)
@@ -61,8 +62,106 @@ def tourney(population):
             winners.append(c1)
         i += 2
     return winners
+    
 
-def algorithm(pop_size, iters, mutation_p):
+def apply_operators(population, mutation_p):
+    mut_population = []
+    for c in population:
+        mut_population.append(mutate(c, mutation_p))
+    
+    child_population = []
+    i = 0
+    while i < len(population) - 1:
+        c1 = population[i]
+        c2 = population[i+1]
+        
+        c3, c4 = cross_over_all(c1, c2)
+        child_population.append(c3)
+        child_population.append(c4)
+        
+        c3, c4 = cross_over_one(c1, c2, 0)
+        child_population.append(c3)
+        child_population.append(c4)
+        
+        c3, c4 = cross_over_one(c1, c2, 1)
+        child_population.append(c3)
+        child_population.append(c4)
+        
+        c3, c4 = cross_over_one(c1, c2, 2)
+        child_population.append(c3)
+        child_population.append(c4)
+        
+        c3, c4 = cross_over_one(c1, c2, 3)
+        child_population.append(c3)
+        child_population.append(c4)
+        
+        i += 2
+    
+    #mut_child_population = []
+    #for c in child_population:
+        #mut_child_population.append(mutate(c, mutation_p))
+    
+    population.extend(mut_population)
+    population.extend(child_population)
+    population.extend(mut_child_population)
+    return population
+
+
+def algorithm_file(starting_filename, iters, mutation_p):
+    
+    population = []
+    with open(starting_filename, 'rb') as f:
+        population = pickle.load
+    
+    pop_size = len(population)
+    
+    for it in range(iters):
+        
+        print("Starting iteration",it)
+        
+        #perform crossovers and mutations
+        population = apply_operators(population, mutation_p)
+        
+        print("Generation complete, starting tourney.")
+        
+        while len(population) > pop_size:
+            population = tourney(population)
+        
+        print("Iteration",it,"done.")
+        
+        #with open(starting_filename+"_gen"+str(it), 'wb') as f:
+            #pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)
+    
+    with open(starting_filename+"_final", 'wb') as f:
+        pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)
+    
+    return population
+
+def algorithm(population, iters, mutation_p, output_filename=None):
+    
+    pop_size = len(population)
+    
+    for it in range(iters):
+        
+        print("Starting iteration",it)
+        
+        #perform crossovers and mutations
+        population = apply_operators(population, mutation_p)
+        
+        print("Generation complete, starting tourney.")
+        
+        while len(population) > pop_size:
+            population = tourney(population)
+        
+        print("Iteration",it,"done.")
+    
+    if output_filename:
+        with open(output_filename, 'wb') as f:
+            pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)
+    
+    return population
+
+def algorithm_fresh(pop_size, iters, mutation_p, output_filename=None):
     population = []
     for i in range(pop_size):
         c = grammar.population_member()
@@ -70,58 +169,22 @@ def algorithm(pop_size, iters, mutation_p):
         population.append(c)
     
     for it in range(iters):
-        #evaluate the population, keeping the tourney winners
-        new_population = []
-        
-        
-        
-        while len(population) > pop_size:
-            population = tourney(population)
         
         print("Starting iteration",it)
         
         #perform crossovers and mutations
-        mut_population = []
-        for c in population:
-            mut_population.append(mutate(c, mutation_p))
+        population = apply_operators(population, mutation_p)
         
-        child_population = []
-        i = 0
-        while i < len(population) - 1:
-            c1 = population[i]
-            c2 = population[i+1]
-            
-            c3, c4 = cross_over_all(c1, c2)
-            child_population.append(c3)
-            child_population.append(c4)
-            
-            c3, c4 = cross_over_one(c1, c2, 0)
-            child_population.append(c3)
-            child_population.append(c4)
-            
-            c3, c4 = cross_over_one(c1, c2, 1)
-            child_population.append(c3)
-            child_population.append(c4)
-            
-            c3, c4 = cross_over_one(c1, c2, 2)
-            child_population.append(c3)
-            child_population.append(c4)
-            
-            c3, c4 = cross_over_one(c1, c2, 3)
-            child_population.append(c3)
-            child_population.append(c4)
-            
-            i += 2
+        print("Generation complete, starting tourney.")
         
-        mut_child_population = []
-        for c in child_population:
-            mut_child_population.append(mutate(c, mutation_p))
-        
-        population.extend(mut_population)
-        population.extend(child_population)
-        population.extend(mut_child_population)
+        while len(population) > pop_size:
+            population = tourney(population)
         
         print("Iteration",it,"done.")
+        
+    if output_filename:
+        with open(output_filename, 'wb') as f:
+            pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)
     
     return population
         

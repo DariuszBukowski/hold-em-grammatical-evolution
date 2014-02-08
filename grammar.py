@@ -44,10 +44,10 @@ class population_member:
         self.chr[0].add(0) # 5 0
         
         self.chr[0].add(1) #if true then
-        self.chr[0].add(0) #raise
+        self.chr[0].add(1) #raise
         
         self.chr[0].add(1) #else
-        self.chr[0].add(1) #call
+        self.chr[0].add(0) #call
         
         
         self.chr[0].add(1) #else
