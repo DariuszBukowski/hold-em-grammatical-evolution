@@ -43,14 +43,14 @@ class population_member:
         self.chr[0].add(1) # 5 _
         self.chr[0].add(0) # 5 0
         
-        self.chr[0].add(1) #if true then
+        self.chr[0].add(1) #if true then action
         self.chr[0].add(1) #raise
         
-        self.chr[0].add(1) #else
+        self.chr[0].add(1) #else action
         self.chr[0].add(0) #call
         
         
-        self.chr[0].add(1) #else
+        self.chr[0].add(1) #else action
         self.chr[0].add(2) #fold
     
     def init_chr_random(self, i):

@@ -129,8 +129,8 @@ def algorithm_file(starting_filename, iters, mutation_p):
         
         print("Iteration",it,"done.")
         
-        #with open(starting_filename+"_gen"+str(it), 'wb') as f:
-            #pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)
+        with open(starting_filename+"_gen"+str(it), 'wb') as f:
+            pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)
     
     with open(starting_filename+"_final", 'wb') as f:
         pickle.dump(population, f, pickle.HIGHEST_PROTOCOL)

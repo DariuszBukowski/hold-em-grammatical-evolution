@@ -2,7 +2,7 @@ import sys
 import evol
 
 def main():
-    pop = evol.algorithm_file("end_result", 3, 0.1)
+    pop = evol.algorithm_file("end_result_final_final", 50000, 0.1)
     while len(pop) > 1:
         pop = evol.tourney(pop)
     print(pop[0].rule[0].text())
