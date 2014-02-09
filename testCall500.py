@@ -1,8 +1,7 @@
 import sys
 import evol
-import grammar
-import pickle
 import twoPlayersGame
+import grammar
 
 def make_caller():
     caller = grammar.population_member()
@@ -29,31 +28,23 @@ def make_caller():
     
     return caller
 
-def test_pop(filename):
-    pop = []
-    with open(filename, 'rb') as f:
-        pop = pickle.load(f)
-    #pick the best representative
-    while len(pop) > 1:
-        pop = evol.tourney(pop)
-        
-    c1 = make_caller()
-    c2 = pop[0]
-    
-    
-    win = 0
-    for i in range(100):
-        G = twoPlayersGame.game()
-        #G.text_output = True
-        G.addPlayer(c1)
-        G.addPlayer(c2)
-        if G.run():
-            win += 1
-    print(win)
-        
-    
-    
+def main():
+    pop = evol.algorithm_fresh(50, 1, 0.1, "call_results")
+    while True:
+        while len(pop) > 1:
+            pop = evol.tourney(pop)
+        res = 0.0
+        for _ in range(500):
+            c1 = make_caller()
+            c2 = pop[0]
+            G = twoPlayersGame.game()
+            G.addPlayer(c1)
+            G.addPlayer(c2)
+            if G.run():
+                res += 0.002
+        print(res)
+        pop = evol.algorithm_file("call_results", 1, 0.1)
 
 if __name__ == "__main__":
-    test_pop("end_result_final_final_gen1604")
+    main()
     
